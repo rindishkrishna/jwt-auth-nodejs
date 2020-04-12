@@ -5,21 +5,48 @@ const register =require('../Models/Register');
 const asyncvalidator =require('../Middleware/Async');
 const jwt = require("jsonwebtoken");
 const { check, validationResult } = require('express-validator');
-
-Router.get('/',
+const myValidationResult = validationResult.withDefaults({
+    formatter: (error) => {
+        return {
+            msg: error.msg,
+        };
+    }
+});
+/**
+ * @swagger
+ *
+ * /login:
+ *   post:
+ *     description: Login to the application
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: email
+ *         description: Username to use for login.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: User's password.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: login
+ */
+Router.post('/',
     [
         check('email','Email is Required').isEmail(),
-        check('name','username should have min. 5 characters').isLength({min:5}),
         check('password',).isLength({min:6}).withMessage('password must be min. 6 characters.')
-            .not().isEmpty().withMessage('should not be empty')
     ],asyncvalidator(async (req,res)=>{
-    const errors = validationResult(req);
+        const errors = myValidationResult(req);
     if(!errors.isEmpty()) return res.status(422).json(errors.array() );
     let user = await register.findOne({email:req.body.email});
-    if(!user) return res.status(400).send("invalid email or password");
+    if(!user) return res.status(400).send([{msg:"invalid email or password"}]);
     const valid= await  bcrypt.compare(req.body.password ,user.password);
-    if(!valid) return res.status(400).send("invalid email or password");
-    const token =jwt.sign({_id: this._id},process.env.PRIVATEKEY);
-        res.header('x-auth',token).send("successful login");
+    if(!valid) return res.status(400).send([{msg:"invalid email or password"}]);
+    const token =jwt.sign({id: user._id,name:user.name,roomno:user.roomno},process.env.PRIVATEKEY);
+        res.send({token:token});
 }));
 module.exports=Router;
