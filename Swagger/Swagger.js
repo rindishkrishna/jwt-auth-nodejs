@@ -15,7 +15,7 @@ const options = {
             },
         }
     },
-    apis: ['./Routes/LoginRoute.js','./Routes/RegisterRoute.js','./Routes/ReviewRoute.js','./Routes/MessRoute.js','./Routes/CountRoute.js','./Routes/ForgotpassRoute.js']
+    apis: ['./Routes/LoginRoute.js','./Routes/RegisterRoute.js','./Routes/ReviewRoute.js','./Routes/MessRoute.js','./Routes/CountRoute.js','./Routes/ForgotpassRoute.js','./Routes/PlantsRoute.js']
 };
 const specs = swaggerJsdoc(options);
 module.exports =specs;
